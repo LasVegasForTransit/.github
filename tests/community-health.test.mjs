@@ -10,7 +10,7 @@ const read = (file) => readFile(path.join(root, file));
 test('published community files match the pinned tooling release', async () => {
   const source = JSON.parse(await read('SOURCE.json'));
   assert.equal(source.repository, 'LasVegasForTransit/repository-tooling');
-  assert.equal(source.ref, 'v1.0.1');
+  assert.equal(source.ref, 'v0.1.0');
 
   for (const [file, expected] of Object.entries(source.files)) {
     const digest = createHash('sha256').update(await read(file)).digest('hex');
