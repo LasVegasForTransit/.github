@@ -5,5 +5,5 @@ The files under `.github/` are published copies from the pinned
 Update the source repository, publish a release, then update the files and
 checksums here together.
 
-Run `npm run check` before opening a pull request. Use the organization
+Run `pnpm check` before opening a pull request. Use the organization
 `github-contribution` skill for GitHub creation.

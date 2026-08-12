@@ -1,11 +1,11 @@
 {
   "repository": "LasVegasForTransit/repository-tooling",
-  "ref": "v0.1.1",
-  "commit": "264ab732a37162a1b1b324f51820b1a5b0537550",
+  "ref": "v0.1.3",
+  "commit": "d74383bc14738153114aa0b00f5278470da3fc26",
   "files": {
     ".github/ISSUE_TEMPLATE/bug.yml": "640865f0fc20f6dbc5335db7a9a3a4b0d0e471829ff5da46c0f785497624ba36",
     ".github/ISSUE_TEMPLATE/feature.yml": "b9510f2223104a4f420a3bd52d212512f5613c65ee4cf1efdc83a8fffa1149f8",
     ".github/ISSUE_TEMPLATE/config.yml": "8b09e7df09fc7534371988062769ee427af2954a02c04c763e8a8005be0f2be4",
-    ".github/pull_request_template.md": "38ee62db634c37469a06d37bfac8c63a8c1592a7fa4c612b8c8206b68ef8b953"
+    ".github/pull_request_template.md": "70d6d0006e6814ed89a8b7487e3ed028c11d957305f154f76fba18706cd31954"
   }
 }
