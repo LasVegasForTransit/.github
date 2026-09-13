@@ -5,16 +5,19 @@ import path from 'node:path';
 import test from 'node:test';
 
 const root = path.resolve(import.meta.dirname, '..');
-const read = (file) => readFile(path.join(root, file));
+/** @param {string} file */
+const read = (file) => readFile(path.join(root, file), 'utf8');
 
 test('published community files match the pinned tooling release', async () => {
   const source = JSON.parse(await read('SOURCE.json'));
   assert.equal(source.repository, 'LasVegasForTransit/repository-tooling');
-  assert.equal(source.ref, 'v0.1.3');
-  assert.equal(source.commit, 'd74383bc14738153114aa0b00f5278470da3fc26');
+  assert.equal(source.ref, 'v0.2.7');
+  assert.equal(source.commit, '6f34bbba529a8ee53badbe6a1696658a0e0411aa');
 
   for (const [file, expected] of Object.entries(source.files)) {
-    const digest = createHash('sha256').update(await read(file)).digest('hex');
+    const digest = createHash('sha256')
+      .update(await read(file))
+      .digest('hex');
     assert.equal(digest, expected, file);
   }
 });
@@ -33,14 +36,16 @@ test('the pull request template contains only the readable organization outline'
   assert.doesNotMatch(template, /<!--|metadata/i);
 });
 
-test('the published-template repository uses TransitMapper’s pnpm contract', async () => {
+test('the community-health repository uses the organization toolchain', async () => {
   const packageJson = JSON.parse(await read('package.json'));
-  const agents = (await read('AGENTS.md')).toString();
-  const workflow = (await read('.github/workflows/ci.yml')).toString();
-  const setup = (await read('.github/actions/setup-node-pnpm/action.yml')).toString();
+  const agents = await read('AGENTS.md');
+  const workflow = await read('.github/workflows/ci.yml');
+  const setup = await read('.github/actions/setup-node-pnpm/action.yml');
 
-  assert.equal(packageJson.packageManager, 'pnpm@11.15.1');
-  assert.equal(packageJson.scripts.check, 'node --test --test-concurrency=1');
+  assert.equal(packageJson.packageManager, 'pnpm@11.25.0');
+  assert.equal(packageJson.engines.node, '^24.20.0');
+  assert.equal(packageJson.scripts.bootstrap, 'lvbt bootstrap');
+  assert.match(packageJson.scripts.check, /lvbt check/);
   await access(path.join(root, 'pnpm-lock.yaml'));
   assert.match(agents, /pnpm check/);
   assert.doesNotMatch(agents, /npm run check/);

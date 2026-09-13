@@ -1,9 +1,9 @@
 # Las Vegans for Better Transit
 
-This special repository publishes the native GitHub issue forms and pull
-request template inherited by LVBT repositories.
+LVBT repositories inherit their GitHub issue forms and pull request template from this organization
+profile.
 
 The canonical files live in
 [`LasVegasForTransit/repository-tooling`](https://github.com/LasVegasForTransit/repository-tooling).
-[`SOURCE.json`](SOURCE.json) pins the release and checksums published here.
-Individual repositories should not copy or override these templates.
+[`SOURCE.json`](SOURCE.json) records the source release and checksums. Changes begin in the tooling
+repository and reach the organization profile through a reviewed release.
