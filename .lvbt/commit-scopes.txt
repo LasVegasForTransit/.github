@@ -1,0 +1,6 @@
+# One scope per durable boundary in this repository.
+templates
+provenance
+docs
+ci
+dx
