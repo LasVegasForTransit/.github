@@ -9,13 +9,15 @@
   "scripts": {
     "bootstrap": "lvbt bootstrap",
     "preflight": "lvbt preflight",
+    "standards:update": "node .lvbt/web-platform/standards/web-platform-cli.ts update",
+    "standards:check": "node .lvbt/web-platform/standards/web-platform-cli.ts check",
     "build": "node --check tests/community-health.test.mjs",
     "lint": "eslint . --max-warnings 0",
     "check-types": "tsc --noEmit",
     "test": "node --test --test-concurrency=1",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "pnpm format:check && markdownlint-cli2 && lvbt check && pnpm lint && pnpm check-types && pnpm test",
+    "check": "pnpm standards:check && pnpm format:check && markdownlint-cli2 && lvbt check && pnpm lint && pnpm check-types && pnpm test",
     "check:fix": "pnpm format && markdownlint-cli2 --fix && pnpm lint -- --fix",
     "prepare": "git config --local core.hooksPath .githooks 2>/dev/null || true"
   },
@@ -23,10 +25,10 @@
     "*": "prettier --write --ignore-unknown"
   },
   "devDependencies": {
-    "@lvbt/cli": "github:LasVegasForTransit/repository-tooling#v0.2.7&path:/packages/cli",
-    "@lvbt/eslint-config": "github:LasVegasForTransit/repository-tooling#v0.2.7&path:/packages/eslint-config",
-    "@lvbt/prettier-config": "github:LasVegasForTransit/repository-tooling#v0.2.7&path:/packages/prettier-config",
-    "@lvbt/typescript-config": "github:LasVegasForTransit/repository-tooling#v0.2.7&path:/packages/typescript-config",
+    "@lvbt/cli": "file:.lvbt/web-platform/packages/cli",
+    "@lvbt/eslint-config": "file:.lvbt/web-platform/packages/eslint-config",
+    "@lvbt/prettier-config": "file:.lvbt/web-platform/packages/prettier-config",
+    "@lvbt/typescript-config": "file:.lvbt/web-platform/packages/typescript-config",
     "@types/node": "catalog:",
     "eslint": "catalog:",
     "lint-staged": "catalog:",
