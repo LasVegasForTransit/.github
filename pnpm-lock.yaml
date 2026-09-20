@@ -38,17 +38,17 @@ importers:
   .:
     devDependencies:
       '@lvbt/cli':
-        specifier: github:LasVegasForTransit/repository-tooling#v0.2.7&path:/packages/cli
-        version: https://codeload.github.com/LasVegasForTransit/repository-tooling/tar.gz/6f34bbba529a8ee53badbe6a1696658a0e0411aa#path:/packages/cli
+        specifier: file:.lvbt/web-platform/packages/cli
+        version: file:.lvbt/web-platform/packages/cli
       '@lvbt/eslint-config':
-        specifier: github:LasVegasForTransit/repository-tooling#v0.2.7&path:/packages/eslint-config
-        version: https://codeload.github.com/LasVegasForTransit/repository-tooling/tar.gz/6f34bbba529a8ee53badbe6a1696658a0e0411aa#path:/packages/eslint-config(eslint@10.9.1)(turbo@2.10.12)(typescript@6.0.3)
+        specifier: file:.lvbt/web-platform/packages/eslint-config
+        version: file:.lvbt/web-platform/packages/eslint-config(eslint@10.9.1)(turbo@2.10.12)(typescript@6.0.3)
       '@lvbt/prettier-config':
-        specifier: github:LasVegasForTransit/repository-tooling#v0.2.7&path:/packages/prettier-config
-        version: https://codeload.github.com/LasVegasForTransit/repository-tooling/tar.gz/6f34bbba529a8ee53badbe6a1696658a0e0411aa#path:/packages/prettier-config(prettier@3.9.6)
+        specifier: file:.lvbt/web-platform/packages/prettier-config
+        version: file:.lvbt/web-platform/packages/prettier-config(prettier@3.9.6)
       '@lvbt/typescript-config':
-        specifier: github:LasVegasForTransit/repository-tooling#v0.2.7&path:/packages/typescript-config
-        version: https://codeload.github.com/LasVegasForTransit/repository-tooling/tar.gz/6f34bbba529a8ee53badbe6a1696658a0e0411aa#path:/packages/typescript-config
+        specifier: file:.lvbt/web-platform/packages/typescript-config
+        version: file:.lvbt/web-platform/packages/typescript-config
       '@types/node':
         specifier: 'catalog:'
         version: 24.13.3
@@ -221,28 +221,24 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@lvbt/cli@https://codeload.github.com/LasVegasForTransit/repository-tooling/tar.gz/6f34bbba529a8ee53badbe6a1696658a0e0411aa#path:/packages/cli':
-    resolution: {gitHosted: true, integrity: sha512-M6M3mzTrNOzG73DvDUnzfqq/8Wbo7m+Uds+RNy4O/59fVqcYrW/3DugL3g3jRNdTiqOgwAf53pGWdTdcpDD0Uw==, path: /packages/cli, tarball: https://codeload.github.com/LasVegasForTransit/repository-tooling/tar.gz/6f34bbba529a8ee53badbe6a1696658a0e0411aa}
-    version: 0.2.7
+  '@lvbt/cli@file:.lvbt/web-platform/packages/cli':
+    resolution: {directory: .lvbt/web-platform/packages/cli, type: directory}
     engines: {node: '>=24'}
     hasBin: true
 
-  '@lvbt/eslint-config@https://codeload.github.com/LasVegasForTransit/repository-tooling/tar.gz/6f34bbba529a8ee53badbe6a1696658a0e0411aa#path:/packages/eslint-config':
-    resolution: {gitHosted: true, integrity: sha512-M6M3mzTrNOzG73DvDUnzfqq/8Wbo7m+Uds+RNy4O/59fVqcYrW/3DugL3g3jRNdTiqOgwAf53pGWdTdcpDD0Uw==, path: /packages/eslint-config, tarball: https://codeload.github.com/LasVegasForTransit/repository-tooling/tar.gz/6f34bbba529a8ee53badbe6a1696658a0e0411aa}
-    version: 0.2.7
+  '@lvbt/eslint-config@file:.lvbt/web-platform/packages/eslint-config':
+    resolution: {directory: .lvbt/web-platform/packages/eslint-config, type: directory}
     peerDependencies:
       eslint: '>=10'
       typescript: '>=5.9'
 
-  '@lvbt/prettier-config@https://codeload.github.com/LasVegasForTransit/repository-tooling/tar.gz/6f34bbba529a8ee53badbe6a1696658a0e0411aa#path:/packages/prettier-config':
-    resolution: {gitHosted: true, integrity: sha512-M6M3mzTrNOzG73DvDUnzfqq/8Wbo7m+Uds+RNy4O/59fVqcYrW/3DugL3g3jRNdTiqOgwAf53pGWdTdcpDD0Uw==, path: /packages/prettier-config, tarball: https://codeload.github.com/LasVegasForTransit/repository-tooling/tar.gz/6f34bbba529a8ee53badbe6a1696658a0e0411aa}
-    version: 0.2.7
+  '@lvbt/prettier-config@file:.lvbt/web-platform/packages/prettier-config':
+    resolution: {directory: .lvbt/web-platform/packages/prettier-config, type: directory}
     peerDependencies:
       prettier: '>=3'
 
-  '@lvbt/typescript-config@https://codeload.github.com/LasVegasForTransit/repository-tooling/tar.gz/6f34bbba529a8ee53badbe6a1696658a0e0411aa#path:/packages/typescript-config':
-    resolution: {gitHosted: true, integrity: sha512-M6M3mzTrNOzG73DvDUnzfqq/8Wbo7m+Uds+RNy4O/59fVqcYrW/3DugL3g3jRNdTiqOgwAf53pGWdTdcpDD0Uw==, path: /packages/typescript-config, tarball: https://codeload.github.com/LasVegasForTransit/repository-tooling/tar.gz/6f34bbba529a8ee53badbe6a1696658a0e0411aa}
-    version: 0.2.7
+  '@lvbt/typescript-config@file:.lvbt/web-platform/packages/typescript-config':
+    resolution: {directory: .lvbt/web-platform/packages/typescript-config, type: directory}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -1239,9 +1235,9 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  '@lvbt/cli@https://codeload.github.com/LasVegasForTransit/repository-tooling/tar.gz/6f34bbba529a8ee53badbe6a1696658a0e0411aa#path:/packages/cli': {}
+  '@lvbt/cli@file:.lvbt/web-platform/packages/cli': {}
 
-  '@lvbt/eslint-config@https://codeload.github.com/LasVegasForTransit/repository-tooling/tar.gz/6f34bbba529a8ee53badbe6a1696658a0e0411aa#path:/packages/eslint-config(eslint@10.9.1)(turbo@2.10.12)(typescript@6.0.3)':
+  '@lvbt/eslint-config@file:.lvbt/web-platform/packages/eslint-config(eslint@10.9.1)(turbo@2.10.12)(typescript@6.0.3)':
     dependencies:
       '@eslint-community/eslint-plugin-eslint-comments': 4.7.2(eslint@10.9.1)
       '@eslint/js': 10.0.1(eslint@10.9.1)
@@ -1257,11 +1253,11 @@ snapshots:
       - supports-color
       - turbo
 
-  '@lvbt/prettier-config@https://codeload.github.com/LasVegasForTransit/repository-tooling/tar.gz/6f34bbba529a8ee53badbe6a1696658a0e0411aa#path:/packages/prettier-config(prettier@3.9.6)':
+  '@lvbt/prettier-config@file:.lvbt/web-platform/packages/prettier-config(prettier@3.9.6)':
     dependencies:
       prettier: 3.9.6
 
-  '@lvbt/typescript-config@https://codeload.github.com/LasVegasForTransit/repository-tooling/tar.gz/6f34bbba529a8ee53badbe6a1696658a0e0411aa#path:/packages/typescript-config': {}
+  '@lvbt/typescript-config@file:.lvbt/web-platform/packages/typescript-config': {}
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:

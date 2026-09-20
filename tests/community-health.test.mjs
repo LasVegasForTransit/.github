@@ -11,8 +11,8 @@ const read = (file) => readFile(path.join(root, file), 'utf8');
 test('published community files match the pinned tooling release', async () => {
   const source = JSON.parse(await read('SOURCE.json'));
   assert.equal(source.repository, 'LasVegasForTransit/repository-tooling');
-  assert.equal(source.ref, 'v0.2.7');
-  assert.equal(source.commit, '6f34bbba529a8ee53badbe6a1696658a0e0411aa');
+  assert.equal(source.ref, 'v0.2.8');
+  assert.equal(source.commit, '8c33f0f2855fb1ce919df0c076d866392b83946e');
 
   for (const [file, expected] of Object.entries(source.files)) {
     const digest = createHash('sha256')
@@ -45,7 +45,17 @@ test('the community-health repository uses the organization toolchain', async ()
   assert.equal(packageJson.packageManager, 'pnpm@11.25.0');
   assert.equal(packageJson.engines.node, '^24.20.0');
   assert.equal(packageJson.scripts.bootstrap, 'lvbt bootstrap');
+  assert.equal(
+    packageJson.scripts['standards:update'],
+    'node .lvbt/web-platform/standards/web-platform-cli.ts update',
+  );
+  assert.equal(
+    packageJson.scripts['standards:check'],
+    'node .lvbt/web-platform/standards/web-platform-cli.ts check',
+  );
+  assert.match(packageJson.scripts.check, /^pnpm standards:check &&/);
   assert.match(packageJson.scripts.check, /lvbt check/);
+  assert.equal(packageJson.devDependencies['@lvbt/cli'], 'file:.lvbt/web-platform/packages/cli');
   await access(path.join(root, 'pnpm-lock.yaml'));
   assert.match(agents, /pnpm check/);
   assert.doesNotMatch(agents, /npm run check/);
