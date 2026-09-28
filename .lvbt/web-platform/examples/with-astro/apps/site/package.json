@@ -1,5 +1,5 @@
 {
-  "name": "@lvbt/site",
+  "name": "@lasvegasfortransit/site",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -8,6 +8,7 @@
     "dev": "astro dev --host 127.0.0.1 --port 4321",
     "preview": "astro preview --host 127.0.0.1 --port 4321",
     "lint": "eslint . --max-warnings 0",
+    "sync": "astro sync",
     "check-types": "astro check",
     "test": "vitest run",
     "test:e2e": "playwright test"
@@ -20,10 +21,10 @@
   },
   "devDependencies": {
     "@astrojs/check": "catalog:",
-    "@lvbt/eslint-config": "github:LasVegasForTransit/repository-tooling#v0.2.8&path:/packages/eslint-config",
-    "@lvbt/playwright-config": "github:LasVegasForTransit/repository-tooling#v0.2.8&path:/packages/playwright-config",
-    "@lvbt/typescript-config": "github:LasVegasForTransit/repository-tooling#v0.2.8&path:/packages/typescript-config",
-    "@lvbt/vitest-config": "github:LasVegasForTransit/repository-tooling#v0.2.8&path:/packages/vitest-config",
+    "@lasvegasfortransit/eslint-config": "0.4.5",
+    "@lasvegasfortransit/playwright-config": "0.4.5",
+    "@lasvegasfortransit/typescript-config": "0.4.5",
+    "@lasvegasfortransit/vitest-config": "0.4.5",
     "@playwright/test": "catalog:",
     "@types/node": "catalog:",
     "eslint": "catalog:",

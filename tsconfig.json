@@ -1,5 +1,5 @@
 {
-  "extends": "@lvbt/typescript-config/node.json",
+  "extends": "@lasvegasfortransit/typescript-config/node.json",
   "compilerOptions": {
     "allowJs": true,
     "checkJs": true,
