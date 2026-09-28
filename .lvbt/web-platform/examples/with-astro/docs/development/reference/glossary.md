@@ -20,10 +20,10 @@ of every tool for the whole organization. A package writes `"catalog:"` as a ver
 pinned one.
 
 <a id="eslint"></a>**ESLint**: finds likely bugs and enforces code rules. The rules come from
-`@lvbt/eslint-config`.
+`@lasvegasfortransit/eslint-config`.
 
 <a id="prettier"></a>**Prettier**: formats code the same way for everyone, so formatting is never
-discussed in review. The settings come from `@lvbt/prettier-config`.
+discussed in review. The settings come from `@lasvegasfortransit/prettier-config`.
 
 <a id="vitest"></a>**Vitest**: runs unit tests under `tests/`.
 
@@ -49,3 +49,9 @@ request. The required status is named `Validate`.
 
 <a id="preflight"></a>**Preflight**: `pnpm preflight`, the check that your machine can build and
 deploy this repository, with a fix printed for anything missing.
+
+<a id="platform-manifest"></a>**Platform manifest**: `platform.json`, next to an app's production
+`wrangler.jsonc`, which lists everything the app needs in production: its database, bucket, bot
+check, admin sign-in, email domain, secrets, and the values that must never be set there.
+`pnpm preflight --production` checks production against it, and `pnpm bootstrap --production` sets
+up what is missing.
