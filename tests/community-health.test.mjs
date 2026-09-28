@@ -55,7 +55,10 @@ test('the community-health repository uses the organization toolchain', async ()
   );
   assert.match(packageJson.scripts.check, /^pnpm standards:check &&/);
   assert.match(packageJson.scripts.check, /lvbt check/);
-  assert.equal(packageJson.devDependencies['@lasvegasfortransit/cli'], 'file:.lvbt/web-platform/packages/cli');
+  assert.equal(
+    packageJson.devDependencies['@lasvegasfortransit/cli'],
+    'file:.lvbt/web-platform/packages/cli',
+  );
   await access(path.join(root, 'pnpm-lock.yaml'));
   assert.match(agents, /pnpm check/);
   assert.doesNotMatch(agents, /npm run check/);
