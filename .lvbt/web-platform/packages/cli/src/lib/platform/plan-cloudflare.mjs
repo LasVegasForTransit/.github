@@ -1,3 +1,4 @@
+import { configForEnvironment } from './config-scope.mjs';
 import { turnstileGuide } from './guides.mjs';
 import { item, manualGuide, SETUP, TOKEN_HINT, unknownItem } from './plan-items.mjs';
 
@@ -11,7 +12,7 @@ function configItem({ manifest, state, configPath }) {
       ...fields,
       status: 'mismatch',
       detail: `cannot read it: ${state.config.reason}`,
-      next: 'point cloudflare.wranglerConfig at the production wrangler config',
+      next: `point cloudflare.${manifest.cloudflare.cloudflareConfig ? 'cloudflareConfig' : 'wranglerConfig'} at the production config`,
     });
   if (state.config.value.name !== name)
     return item({
@@ -49,8 +50,13 @@ function databaseItem({ state, configPath }, database) {
       status: 'missing',
       detail: 'does not exist',
       next: `${SETUP} creates it`,
-      action: { type: 'd1.create', name: database.name },
+      action: {
+        type: 'd1.create',
+        name: database.name,
+        ...(database.environment ? { environment: database.environment } : {}),
+      },
     });
+  if (!state.config.ok) return unknownItem(fields, state.config);
   const bound = state.config.ok
     ? state.config.value.d1.find((entry) => entry.binding === database.binding)
     : undefined;
@@ -59,14 +65,16 @@ function databaseItem({ state, configPath }, database) {
       ...fields,
       status: 'mismatch',
       detail: `${configPath} does not bind ${database.binding} to ${database.name}`,
-      next: `add it to d1_databases in ${configPath} with database_id ${real.id}`,
+      next: configPath.endsWith('.ts')
+        ? `set worker.env.${database.binding} to bindings.d1({ name: "${database.name}" }) in ${configPath}`
+        : `bind ${database.binding} to database_name ${database.name} in d1_databases in ${configPath}`,
     });
-  if (bound && bound.id !== real.id)
+  if (bound?.id !== undefined && bound.id !== real.id)
     return item({
       ...fields,
       status: 'mismatch',
-      detail: `${configPath} has database_id ${bound.id}, but the database is ${real.id}`,
-      next: `set database_id to ${real.id} in ${configPath}`,
+      detail: `${configPath} has D1 id ${bound.id}, but the database is ${real.id}`,
+      next: `set ${configPath.endsWith('.ts') ? `worker.env.${database.binding} bindings.d1 id` : 'database_id'} to ${real.id} in ${configPath}`,
     });
   return item({ ...fields, status: 'ok', detail: `exists and is bound as ${database.binding}` });
 }
@@ -85,16 +93,20 @@ function migrationsItem({ state, configPath }, database) {
       detail: `cannot read ${database.migrations}: ${files?.reason ?? 'missing'}`,
       next: 'fix the migrations path in platform.json',
     });
-  const action = { type: 'd1.migrate', name: database.name };
+  const action = {
+    type: 'd1.migrate',
+    name: database.name,
+    ...(database.environment ? { environment: database.environment } : {}),
+  };
   const real = state.d1.ok ? state.d1.value[database.name] : undefined;
   if (state.d1.ok && !real)
-    // Wrangler applies migrations to the database_id in the config, so setup
-    // applies them after creating the database only if the config names it.
+    // Setup applies migrations after creating the database only if the config
+    // names it and any explicit ID agrees with the account inventory.
     return item({
       ...fields,
       status: 'missing',
       detail: `${files.value.length} to apply once the database exists and ${configPath} names it`,
-      next: `${SETUP} applies them once ${configPath} has the new database's database_id`,
+      next: `${SETUP} applies them once ${configPath} binds ${database.binding} to ${database.name}`,
       action: { ...action, binding: database.binding, afterCreate: true },
     });
   if (!real?.applied?.ok) return unknownItem(fields, real?.applied ?? state.d1);
@@ -106,15 +118,23 @@ function pendingItem({ state, configPath }, database, { fields, files, real, act
   const pending = files.filter((file) => !real.applied.value.includes(file));
   if (pending.length === 0)
     return item({ ...fields, status: 'ok', detail: `all ${files.length} applied` });
+  if (!state.config.ok) return unknownItem(fields, state.config);
   const bound = state.config.ok
     ? state.config.value.d1.find((entry) => entry.binding === database.binding)
     : undefined;
-  if (state.config.ok && bound?.id !== real.id)
+  if (state.config.ok && bound?.name !== database.name)
     return item({
       ...fields,
       status: 'missing',
-      detail: `${pending.length} of ${files.length} not applied; they wait until ${configPath} has database_id ${real.id}`,
-      next: `set database_id to ${real.id} in ${configPath}, then run ${SETUP} again`,
+      detail: `${pending.length} of ${files.length} not applied; they wait until ${configPath} binds ${database.binding} to ${database.name}`,
+      next: `bind ${database.binding} to ${database.name} in ${configPath}, then run ${SETUP} again`,
+    });
+  if (bound?.id !== undefined && bound.id !== real.id)
+    return item({
+      ...fields,
+      status: 'missing',
+      detail: `${pending.length} of ${files.length} not applied; they wait until ${configPath} has ${configPath.endsWith('.ts') ? 'D1 id' : 'database_id'} ${real.id}`,
+      next: `set ${configPath.endsWith('.ts') ? `worker.env.${database.binding} bindings.d1 id` : 'database_id'} to ${real.id} in ${configPath}, then run ${SETUP} again`,
     });
   return item({
     ...fields,
@@ -126,10 +146,19 @@ function pendingItem({ state, configPath }, database, { fields, files, real, act
 }
 
 export function planD1(context) {
-  return (context.manifest.d1 ?? []).flatMap((database) => [
-    databaseItem(context, database),
-    ...(database.migrations ? [migrationsItem(context, database)] : []),
-  ]);
+  return (context.manifest.d1 ?? []).flatMap((database) => {
+    const scoped = {
+      ...context,
+      state: {
+        ...context.state,
+        config: configForEnvironment(context.state.config, database.environment),
+      },
+    };
+    return [
+      databaseItem(scoped, database),
+      ...(database.migrations ? [migrationsItem(scoped, database)] : []),
+    ];
+  });
 }
 
 export function planR2({ manifest, state, configPath }) {
@@ -144,15 +173,20 @@ export function planR2({ manifest, state, configPath }) {
         next: `${SETUP} creates it`,
         action: { type: 'r2.create', name: bucket.name },
       });
-    const bound = state.config.ok
-      ? state.config.value.r2.find((entry) => entry.binding === bucket.binding)
-      : undefined;
-    if (state.config.ok && bound?.name !== bucket.name)
+    const config = configForEnvironment(state.config, bucket.environment);
+    if (!config.ok) return unknownItem(fields, config);
+    const bound = (config.value.r2 ?? []).find((entry) => entry.binding === bucket.binding);
+    const location = bucket.environment
+      ? `${bucket.environment} environment of ${configPath}`
+      : configPath;
+    if (bound?.name !== bucket.name)
       return item({
         ...fields,
         status: 'mismatch',
-        detail: `${configPath} does not bind ${bucket.binding} to ${bucket.name}`,
-        next: `add it to r2_buckets in ${configPath}`,
+        detail: `${location} does not bind ${bucket.binding} to ${bucket.name}`,
+        next: configPath.endsWith('.ts')
+          ? `set worker.env.${bucket.binding} to bindings.r2({ name: "${bucket.name}" }) in ${location}`
+          : `add it to r2_buckets in ${location}`,
       });
     return item({ ...fields, status: 'ok', detail: `exists and is bound as ${bucket.binding}` });
   });
