@@ -13,7 +13,7 @@ import path from 'node:path';
 export function runCommand(command, args, { cwd, env, input, inherit = false } = {}) {
   const result = spawnSync(command, args, {
     cwd,
-    env: env ? { ...process.env, ...env } : process.env,
+    env: { ...process.env, ...env, pnpm_config_verify_deps_before_run: 'error' },
     input,
     encoding: 'utf8',
     stdio: inherit ? 'inherit' : ['pipe', 'pipe', 'pipe'],
@@ -166,7 +166,7 @@ export function dnsResolver(request = fetch) {
     );
     if (!response.ok) throw new Error(`DNS lookup answered ${response.status}`);
     const payload = await response.json();
-    const code = { MX: 15, TXT: 16 }[type];
+    const code = { CNAME: 5, MX: 15, TXT: 16 }[type];
     return (payload.Answer ?? [])
       .filter((answer) => code === undefined || answer.type === code)
       .map((answer) => answer.data);

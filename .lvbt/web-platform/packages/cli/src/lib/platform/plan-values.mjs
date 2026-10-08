@@ -1,4 +1,11 @@
-import { emailRecords, resendDomainGuide, varGuide } from './guides.mjs';
+import { secretTargets } from './secret-scope.mjs';
+import {
+  configVarEntry,
+  configVarLocation,
+  emailRecords,
+  resendDomainGuide,
+  varGuide,
+} from './guides.mjs';
 import { findApp } from './plan-access.mjs';
 import { findWidget } from './plan-cloudflare.mjs';
 import { GH_HINT, item, SETUP, targetLabel, unknownItem } from './plan-items.mjs';
@@ -35,6 +42,7 @@ export function secretSource(secret, manifest) {
       value: manifest.cloudflare.accountId,
       from: 'the Cloudflare account ID',
     };
+  if (!secretTargets(secret).includes('worker')) return { type: 'prompt' };
   const widget = (manifest.turnstile ?? []).find((candidate) => candidate.secret === secret.name);
   if (widget) return { type: 'turnstile', widget, from: `the ${widget.name} Turnstile widget` };
   for (const app of manifest.access ?? []) {
@@ -86,6 +94,14 @@ function secretItem({ manifest, state }, secret, target) {
     label: `${secret.name} → ${targetLabel(manifest, target)}`,
     level: secret.use === 'future' ? 'later' : 'required',
   };
+  if (secret.listOnly)
+    return item({
+      ...fields,
+      status: 'missing',
+      level: 'later',
+      detail: 'Documented future requirement; no credential should be created.',
+      next: secret.steps?.join(' ') ?? 'Enable only when the feature is implemented.',
+    });
   const present = stored(state, target, secret.name);
   if (present.blocked)
     return item({
@@ -106,18 +122,11 @@ function secretItem({ manifest, state }, secret, target) {
       status: 'ok',
       detail: plain === undefined ? 'is set' : `is set; it should be ${plain}`,
     });
-  const elsewhere = (secret.targets ?? ['worker']).filter(
-    (other) => other !== target && stored(state, other, secret.name).value === true,
-  );
-  if (source.type === 'generate' && elsewhere.length > 0)
-    // A generated value cannot be read back, so minting another here would
-    // leave the targets holding different values.
-    return item({
-      ...fields,
-      status: 'mismatch',
-      detail: `is not set here but is set on ${elsewhere.map((other) => targetLabel(manifest, other)).join(', ')}, and setup cannot read that value to copy it`,
-      next: `${SETUP} --rotate ${secret.name} stores one new value everywhere`,
-    });
+  const generationProblem =
+    source.type === 'generate'
+      ? generatedSecretProblem({ manifest, state, secret, target, fields })
+      : undefined;
+  if (generationProblem) return generationProblem;
   return item({
     ...fields,
     status: 'missing',
@@ -148,7 +157,7 @@ export function planVars({ manifest, state, configPath }) {
         ...fields,
         status: 'unknown',
         detail: `cannot read ${configPath}`,
-        next: 'fix the wrangler config path',
+        next: 'fix the production config path',
       });
     const widget = (manifest.turnstile ?? []).find(
       (candidate) => candidate.siteKeyVar === variable.name,
@@ -167,8 +176,8 @@ export function planVars({ manifest, state, configPath }) {
       return item({
         ...fields,
         status: 'missing',
-        detail: `is not in vars in ${configPath}`,
-        next: `add it to vars in ${configPath}${live ? ` as "${live.sitekey}"` : ''}`,
+        detail: `is not in ${configVarLocation(configPath)} in ${configPath}`,
+        next: `add ${configVarEntry(variable.name, live?.sitekey ?? '<value>', configPath)} to ${configVarLocation(configPath)} in ${configPath}`,
         action,
       });
     if (live && value !== live.sitekey)
@@ -223,8 +232,8 @@ function workerForbidden({ state, configPath }, entry, fields) {
     });
   if (state.config.ok && entry.name in state.config.value.vars)
     return found(
-      `is in vars in ${configPath}`,
-      `remove it from vars in ${configPath}, then deploy`,
+      `is in ${configVarLocation(configPath)} in ${configPath}`,
+      `remove it from ${configVarLocation(configPath)} in ${configPath}, then deploy`,
     );
   if (deployed && entry.name in deployed.vars)
     return found(
@@ -263,4 +272,29 @@ export function planForbidden(context) {
         : githubForbidden(context, entry, fields, target.slice(7));
     }),
   );
+}
+
+function generatedSecretProblem({ manifest, state, secret, target, fields }) {
+  const unobserved = (secret.targets ?? ['worker']).find(
+    (other) => !stored(state, other, secret.name).ok,
+  );
+  if (unobserved)
+    return item({
+      ...fields,
+      status: 'unknown',
+      detail: 'Cannot generate while another target could not be checked.',
+      next: 'Restore inventory access before generating a value.',
+    });
+  const elsewhere = (secret.targets ?? ['worker']).filter(
+    (other) => other !== target && stored(state, other, secret.name).value === true,
+  );
+  if (elsewhere.length > 0)
+    // A generated value cannot be read back, so minting another here would
+    // leave the targets holding different values.
+    return item({
+      ...fields,
+      status: 'mismatch',
+      detail: `is not set here but is set on ${elsewhere.map((other) => targetLabel(manifest, other)).join(', ')}, and setup cannot read that value to copy it`,
+      next: `${SETUP} --rotate ${secret.name} stores one new value everywhere`,
+    });
 }

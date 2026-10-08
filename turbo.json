@@ -1,0 +1,20 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "globalEnv": ["CI"],
+  "tasks": {
+    "//#build": {},
+    "//#lint": {},
+    "//#check-types": {},
+    "//#test": {
+      "dependsOn": ["//#build", "//#security:secrets", "//#security:dependencies"]
+    },
+    "validate": {},
+    "//#security:secrets": {
+      "cache": false
+    },
+    "//#security:dependencies": {
+      "cache": false
+    }
+  },
+  "globalDependencies": [".lvbt/web-platform.json", ".lvbt/tooling.json", ".github/workflows/**"]
+}
