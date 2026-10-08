@@ -1,7 +1,7 @@
 {
   "repository": "LasVegasForTransit/repository-tooling",
-  "ref": "v0.7.2",
-  "commit": "5b36397d6b91013333d5149894ca435ba9535707",
+  "ref": "v0.7.3",
+  "commit": "c05e7739ef28e30e0e158d9a0e6af010007ad0f0",
   "files": {
     "CONTRIBUTING.md": "e67ab50bae93ea9f0d45a19fc914e6f19be44677b5e29fe51fabb583dd1c41a7",
     ".github/pull_request_template.md": "70d6d0006e6814ed89a8b7487e3ed028c11d957305f154f76fba18706cd31954",
